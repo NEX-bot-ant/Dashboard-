@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Пульт от Точки</title>
+<style>
+  :root{
+    --bg:var(--tg-theme-bg-color,#0e1116); --card:var(--tg-theme-secondary-bg-color,#171b23);
+    --txt:var(--tg-theme-text-color,#eef1f6); --muted:var(--tg-theme-hint-color,#9aa4b6);
+    --link:var(--tg-theme-link-color,#5aa9ff); --btn:var(--tg-theme-button-color,#2f6feb);
+    --btnt:var(--tg-theme-button-text-color,#fff); --line:rgba(128,128,128,.22);
+    --red:#ff5d5d; --amber:#f0b429; --green:#3ddc97;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:15.5px/1.45 system-ui,-apple-system,sans-serif;
+       padding:14px 14px calc(130px + env(safe-area-inset-bottom));}
+  h1{font-size:21px;margin:2px 0 2px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:14px}
+  .lights{font-size:19px;font-weight:650;margin:2px 0 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .lights i{color:var(--muted);font-style:normal;font-weight:400}
+  .tabs{display:flex;gap:8px;margin-bottom:14px}
+  .tab{flex:1;min-height:46px;border-radius:12px;border:1px solid var(--line);background:transparent;
+       color:var(--txt);font:inherit;font-weight:600;font-size:13.5px;padding:0 4px}
+  .tab.on{border-color:var(--btn);background:var(--card)}
+  .card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--amber);
+        border-radius:14px;padding:13px 14px;margin-bottom:10px}
+  .card.r{border-left-color:var(--red)} .card.g{border-left-color:var(--green)}
+  .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .who{font-weight:650;font-size:15.5px;word-break:break-word}
+  .rt{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+  .age{color:var(--muted);font-size:12.5px;white-space:nowrap;border:1px solid currentColor;border-radius:9px;padding:1px 8px}
+  .age.a1{color:var(--green)} .age.a2{color:var(--amber)} .age.a3{color:var(--red)}
+  .x{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:16px}
+  .dock{position:fixed;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;
+        justify-content:space-between;padding:0 20px;pointer-events:none;z-index:10}
+  .fabw{display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:auto}
+  .fabw span{font-size:11px;color:var(--txt);text-shadow:0 0 6px var(--bg),0 0 6px var(--bg)}
+  .fab{position:relative;width:58px;height:58px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+       color:var(--txt);font-size:24px;box-shadow:0 4px 16px rgba(0,0,0,.45)}
+  .fab.save{background:var(--btn);border-color:var(--btn);color:var(--btnt)}
+  .fab i{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:10px;background:var(--red);
+         color:#fff;font:700 12px/20px system-ui;font-style:normal;text-align:center;padding:0 5px}
+  .back{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20}
+  .sheet{position:fixed;left:0;right:0;bottom:0;max-height:70vh;overflow:auto;background:var(--bg);
+         border-radius:18px 18px 0 0;border-top:1px solid var(--line);z-index:21;
+         padding:14px 14px calc(16px + env(safe-area-inset-bottom))}
+  .sheet h3{margin:0 0 10px;font-size:16px}
+  .srow{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);
+        border-radius:12px;padding:10px 12px;margin-bottom:8px}
+  .srow .t{flex:1;min-width:0;word-break:break-word;font-size:14px}
+  .srow small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .sheet button{min-height:40px;border-radius:10px;border:1px solid var(--line);background:transparent;
+                color:var(--txt);font:inherit;font-size:14px;padding:0 14px}
+  .sfoot{display:flex;gap:8px;margin-top:6px}
+  .sfoot button{flex:1;min-height:46px}
+  .sheet .sv{background:var(--btn);border-color:var(--btn);color:var(--btnt);font-weight:600}
+  .toast{position:fixed;left:14px;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--card);
+         border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;z-index:9}
+  .subj{font-size:14.5px;margin-top:3px;word-break:break-word}
+  .sum{font-size:13.5px;color:var(--muted);margin-top:6px;white-space:pre-wrap;word-break:break-word}
+  .src{font-size:12px;color:var(--muted);margin-top:8px;text-transform:uppercase;letter-spacing:.06em}
+  .acts{display:flex;gap:8px;margin-top:10px}
+  .acts button{flex:1;min-height:44px;border-radius:11px;border:1px solid var(--line);background:transparent;
+       color:var(--txt);font:inherit;font-size:15px;font-weight:600}
+  .acts button.primary{background:var(--btn);color:var(--btnt);border-color:var(--btn)}
+  .draftbox{margin-top:10px;padding:10px 12px;border-radius:11px;border:1px dashed var(--line);
+            background:rgba(128,128,128,.08)}
+  .dhl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+  .dtext{font-size:15px;white-space:pre-wrap;word-break:break-word}
+  .empty{color:var(--muted);padding:16px 4px}
+  .day{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:16px 0 6px}
+  .task{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);
+        border-radius:12px;padding:11px 12px;margin-bottom:8px}
+  .task .t{flex:1;font-size:15.5px}
+  .task .w{color:var(--muted);font-size:13px}
+  .task button{width:44px;height:44px;border-radius:11px;border:1px solid var(--line);background:transparent;
+        color:var(--muted);font-size:17px}
+  .over{color:var(--red);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;margin:16px 0 6px}
+  textarea{width:100%;min-height:110px;border-radius:12px;border:1px solid var(--line);background:var(--bg);
+           color:var(--txt);font:inherit;padding:11px;margin-top:8px}
+  .draft{color:var(--muted);font-size:13px;margin-top:6px}
+  .spin{color:var(--muted);padding:20px 0}
+  .err{border-left-color:var(--red)}
+  .genline{font-size:12px;color:var(--muted);text-align:right;margin:4px 2px 0}
+</style>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<h1>Пульт от Точки</h1>
+<div class="sub" id="gen">загружаю…</div>
+<div class="lights" id="lights"></div>
+<div class="tabs" id="tabs"></div>
+<div id="feed"><div class="spin">Загружаю данные…</div></div>
+<div id="tasks" style="display:none"></div>
+<div class="dock" id="dock"></div>
+<div id="sheetwrap"></div>
+<script>window.DASH={"data":{"generated":"2026-11-14 07:51","generated_ts":1794631873,"counts":{"red":1,"yellow":3,"green":0},"errors":[{"source":"booking","error":"[Errno 1] Operation not permitted: '/Users/anton/Desktop/Клодик/Мозг/03_Проекты/01_Клиенты_и_продажи/Закрепления_клиентов.csv'"}],"cards":[{"id":"mail:54c42f286fae","src":"mail","level":"red","who":"Новиков Сергей Владимирович","subject":"RE: Коммерческое предложение","summary":"Антон, добрый день! Клиенту отправил КП ?","ts":"2026-11-13 09:08:00","age":"22 ч","age_h":22.720502442500003},{"id":"mail:ab83206fa4ca","src":"mail","level":"yellow","who":"Землянов Павел Максимович","subject":"RE: Паспорта на LGMG и HERED","summary":"Принял","ts":"2026-11-12 16:18:00","age":"1 дн","age_h":39.553835813333336},{"id":"mail:c36baaafad6e","src":"mail","level":"yellow","who":"Носков Андрей Александрович","subject":"Re: На вас назначены тендеры для анализа.","summary":"+ @Носков Андрей Валерьевич Андрей Валерьевич, добрый день. Видимо на твое имя заявка Получите Outlook для Android","ts":"2026-11-13 14:01:00","age":"17 ч","age_h":17.83716915666667},{"id":"mail:82838b91e3eb","src":"mail","level":"yellow","who":"Бобров Сергей Александрович","subject":"RE: Запрос НВ маркет s0808II m0810JE ИНН скрыт ООО \"КОМУС\"","summary":"Сейчас ничего не креплю. Надо решить – либо твоему дилеру, либо Ревкову передать","ts":"2026-11-13 16:07:00","age":"15 ч","age_h":15.737169177222222}],"tasks":[]},"sig":"efa38c29ef7d57cbfdac188406f8677e"};</script>
+<script>
+const $=id=>document.getElementById(id);
+let D=null, tab='mail', H={};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const TG=()=>window.Telegram&&Telegram.WebApp;
+const SRC_TAB={mail:'mail',max:'msg',telegram:'msg'};
+const SRC_NAME={mail:'почта',max:'MAX',telegram:'Telegram',reminder:'напоминание',booking:'бронь'};
+
+function verify(p){
+  // Подпись проверить может только бот (ключ у него); здесь лишь проверка формы данных.
+  return p && p.data && p.sig && p.data.cards;
+}
+
+// Локальное «скрыто»: карточка исчезает сразу и остаётся скрытой при повторном
+// открытии, пока на Pages не выложена свежая версия. Ключ — id, значение — ts
+// карточки: если придёт новое сообщение (ts другой), карточка вернётся.
+const LS='dash_hidden_v1';
+function lsGet(){try{return JSON.parse(localStorage.getItem(LS)||'{}')||{}}catch(e){return {}}}
+function hideLocal(id,ts){
+  try{
+    const o=lsGet(); o[id]=ts||'x';
+    const k=Object.keys(o); if(k.length>300) k.slice(0,k.length-300).forEach(x=>delete o[x]);
+    localStorage.setItem(LS,JSON.stringify(o));
+  }catch(e){}
+}
+const isHidden=(id,ts)=>!!id&&(H[id]===(ts||'x')||P[id]===(ts||'x'));
+
+function toast(t){
+  const el=document.createElement('div'); el.className='toast'; el.textContent=t;
+  document.body.appendChild(el); setTimeout(()=>el.remove(),4500);
+}
+
+// Возраст досчитываем при открытии: страница собрана утром, а смотрят её днём.
+function elapsedH(){return D.generated_ts?Math.max(0,(Date.now()/1000-D.generated_ts)/3600):0}
+function ageH(c){return (c.age_h==null||c.age_h<0)?-1:c.age_h+elapsedH()}
+function ageTxt(h){if(h<0)return '';if(h<1)return 'только что';if(h<24)return Math.floor(h)+' ч';return Math.floor(h/24)+' дн'}
+function ageCls(h){if(h<0)return '';return h<2?' a1':(h<24?' a2':' a3')}
+
+// ЯЩИК. Нажатие на ✕ / ✓ не уходит боту сразу (sendData закрывает мини-приложение),
+// а кладёт отметку в ящик: карточка скрыта, но её можно вернуть. «Сохранить» шлёт
+// всё одним сообщением: приложение закрывается один раз. Ящик живёт в localStorage.
+const LSP='dash_pending_v1';
+let PEND=[], P={}, sheet=false;
+function pendSet(a){try{localStorage.setItem(LSP,JSON.stringify(a))}catch(e){}}
+function loadPend(){
+  try{const a=JSON.parse(localStorage.getItem(LSP)||'[]');PEND=Array.isArray(a)?a:[]}catch(e){PEND=[]}
+  P={};PEND.forEach(x=>{P[x.id]=x.ts||'x'});
+}
+function enqueue(a,id,ts,label){
+  PEND=PEND.filter(x=>x.id!==id); PEND.push({a:a,id:id,ts:ts||'x',label:label||id});
+  pendSet(PEND); loadPend(); render();
+}
+function undo(i){PEND.splice(i,1);pendSet(PEND);loadPend();if(!PEND.length)sheet=false;render()}
+function undoAll(){PEND=[];pendSet(PEND);loadPend();sheet=false;render()}
+function unhideLocal(id){try{const o=lsGet();delete o[id];localStorage.setItem(LS,JSON.stringify(o))}catch(e){}}
+function restore(items){
+  items.forEach(x=>unhideLocal(x.id)); H=lsGet();
+  const have=new Set(PEND.map(x=>x.id)); items.forEach(x=>{if(!have.has(x.id))PEND.push(x)});
+  pendSet(PEND); loadPend(); render();
+}
+function utf8len(s){try{return new TextEncoder().encode(s).length}catch(e){return unescape(encodeURIComponent(s)).length}}
+function save(){
+  if(!PEND.length) return;
+  const tg=TG();
+  if(!(tg&&tg.sendData)){toast('Сохранить можно только из Telegram: открой страницу кнопкой «Пульт» в чате. Отметки остаются в ящике.');return}
+  // в одно сообщение влезает 4096 байт: берём сколько поместится, остальное ждёт следующего раза
+  const take=[];
+  for(const x of PEND){
+    const cand=take.concat([{a:x.a,id:x.id}]);
+    if(utf8len(JSON.stringify({a:'batch',items:cand}))>3900) break;
+    take.push({a:x.a,id:x.id});
+  }
+  if(!take.length){toast('Название слишком длинное для одного сообщения.');return}
+  const ids=new Set(take.map(x=>x.id)), moved=PEND.filter(x=>ids.has(x.id));
+  moved.forEach(x=>hideLocal(x.id,x.ts)); H=lsGet();
+  PEND=PEND.filter(x=>!ids.has(x.id)); pendSet(PEND); loadPend(); sheet=false; render();
+  try{tg.sendData(JSON.stringify({a:'batch',items:take}))}
+  catch(e){restore(moved);toast('Не отправилось: '+e.message);return}
+  // после удачной отправки приложение закрывается и таймер не дойдёт; если мы ещё живы,
+  // Telegram проигнорировал отправку (страница открыта не кнопкой «Пульт»): возвращаем отметки в ящик
+  setTimeout(()=>{restore(moved);toast('Бот не подтвердил. Отметки вернулись в ящик. Открой страницу кнопкой «Пульт» в чате.')},1500);
+}
+function sheetHTML(){
+  return '<div class="back" data-sheetclose="1"></div><div class="sheet"><h3>Ящик · '+PEND.length+'</h3>'+
+    PEND.map((x,i)=>'<div class="srow"><div class="t">'+esc(x.label)+'<small>'+(x.a==='done'?'выполнено':'закрыть')+'</small></div>'+
+      '<button data-undo="'+i+'">Вернуть</button></div>').join('')+
+    '<div class="sfoot"><button data-undoall="1">Вернуть все</button><button class="sv" data-save="1">Сохранить ('+PEND.length+')</button></div></div>';
+}
+function renderDock(){
+  const n=PEND.length;
+  $('dock').innerHTML=n?'<div class="fabw"><button class="fab" data-tray="1" aria-label="Ящик">📥<i>'+n+'</i></button><span>Ящик</span></div>'+
+    '<div class="fabw"><button class="fab save" data-save="1" aria-label="Сохранить">✓<i>'+n+'</i></button><span>Сохранить</span></div>':'';
+  $('sheetwrap').innerHTML=(sheet&&n)?sheetHTML():'';
+}
+
+const visCards=()=>D.cards.filter(c=>!isHidden(c.id,c.ts));
+const tabCards=t=>visCards().filter(c=>SRC_TAB[c.src]===t);
+const visTasks=()=>(D.tasks||[]).filter(t=>!(t.id&&isHidden(t.id,'')));
+const bookings=()=>visCards().filter(c=>c.src==='booking');
+
+function renderLights(){
+  const c={red:0,yellow:0,green:0};
+  visCards().forEach(x=>{c[x.level]=(c[x.level]||0)+1});
+  $('lights').innerHTML='<span>🔴 '+c.red+'</span><i>·</i><span>🟡 '+c.yellow+'</span><i>·</i><span>🟢 '+c.green+'</span>';
+  const el=elapsedH();
+  $('gen').textContent='обновлено '+(D.generated||'')+(el>=3?' · '+Math.floor(el)+' ч назад':'');
+}
+
+function renderTabs(){
+  const nt=visTasks().length+bookings().length;
+  $('tabs').innerHTML=[['mail','Почта',tabCards('mail').length],['msg','Мессенджеры',tabCards('msg').length],['tasks','Задачи',nt]]
+    .map(x=>'<button class="tab'+(tab===x[0]?' on':'')+'" data-tab="'+x[0]+'">'+x[1]+(x[2]?' · '+x[2]:'')+'</button>').join('');
+}
+
+function cardHTML(c){
+  const lvl=c.level==='red'?' r':(c.level==='green'?' g':'');
+  const idx=D.cards.indexOf(c);
+  const h=ageH(c), at=ageTxt(h);
+  const canDraft=(c.src==='mail'||c.src==='max'||c.src==='telegram');
+  return '<div class="card'+lvl+'"><div class="row"><div class="who">'+esc(c.who||'—')+'</div>'+
+    '<div class="rt">'+(at?'<span class="age'+ageCls(h)+'">'+esc(at)+'</span>':'')+
+    '<button class="x" data-close="'+esc(c.id)+'" data-ci="'+idx+'" aria-label="Закрыть">✕</button></div></div>'+
+    (c.subject?'<div class="subj">'+esc(c.subject)+'</div>':'')+
+    (c.summary?'<div class="sum">'+esc(c.summary)+'</div>':'')+
+    (c.draft?'<div class="draftbox"><div class="dhl">Черновик</div><div class="dtext" id="d'+idx+'">'+esc(c.draft)+'</div>'+
+      '<div class="acts"><button data-copy="'+idx+'">Скопировать</button></div></div>':'')+
+    '<div class="src">'+esc(SRC_NAME[c.src]||c.src)+'</div>'+
+    (canDraft?'<div class="acts"><button class="primary" data-draft="'+esc(c.id)+'">Ответить</button></div>':'')+
+    '</div>';
+}
+
+function errorsHTML(t){
+  const es=(D.errors||[]).filter(e=>(SRC_TAB[e.source]||'tasks')===t);
+  return es.length?'<div class="card err"><div class="who">Источник не отвечает</div><div class="sum">'+
+    es.map(e=>esc(e.source)+': '+esc(e.error)).join('\n')+'</div></div>':'';
+}
+
+function renderFeed(t){
+  const cs=tabCards(t);
+  $('feed').innerHTML=errorsHTML(t)+(cs.length?cs.map(cardHTML).join(''):'<div class="empty">Здесь пусто. Красота.</div>');
+}
+
+function fmtDay(iso){
+  if(!iso) return 'без даты';
+  const parts=iso.split(' ')[0].split('-');
+  const d=new Date(parts[0],parts[1]-1,parts[2]);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const diff=Math.round((d-today)/86400000);
+  if(diff===0) return 'сегодня';
+  if(diff===1) return 'завтра';
+  if(diff===-1) return 'вчера';
+  return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'long'});
+}
+
+function taskHTML(t){
+  // номер нужен только запасной команде бота: это позиция среди открытых задач
+  const ti=t.from_reminder?'':D.tasks.indexOf(t);
+  return '<div class="task"><div class="t">'+esc(t.text)+'<div class="w">'+esc(t.when||t.added||'')+
+    '</div></div><button data-done="'+esc(t.id||'')+'" data-ti="'+ti+'">✓</button></div>';
+}
+
+function renderTasks(){
+  const all=visTasks(), bk=bookings();
+  const over=all.filter(t=>t.overdue), rest=all.filter(t=>!t.overdue);
+  let h=errorsHTML('tasks');
+  if(over.length){h+='<div class="over">просрочено · '+over.length+'</div>'+over.map(taskHTML).join('')}
+  const groups={};
+  rest.forEach(t=>{const k=fmtDay(t.when||t.added);(groups[k]=groups[k]||[]).push(t)});
+  Object.keys(groups).forEach(k=>{h+='<div class="day">'+esc(k)+'</div>'+groups[k].map(taskHTML).join('')});
+  if(bk.length){h+='<div class="day">брони дилеров</div>'+bk.map(cardHTML).join('')}
+  if(!all.length&&!bk.length) h+='<div class="empty">Задач нет.</div>';
+  $('tasks').innerHTML=h;
+}
+
+function render(){
+  if(!D) return;
+  renderLights(); renderTabs(); renderDock();
+  $('feed').style.display=tab==='tasks'?'none':'';
+  $('tasks').style.display=tab==='tasks'?'':'none';
+  if(tab==='tasks') renderTasks(); else renderFeed(tab);
+}
+
+document.addEventListener('click',e=>{
+  if(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.HapticFeedback)Telegram.WebApp.HapticFeedback.selectionChanged();
+  const t=e.target.closest('[data-tab]');
+  if(t){tab=t.dataset.tab;render();return}
+  if(e.target.closest('[data-sheetclose]')){sheet=false;render();return}
+  if(e.target.closest('[data-tray]')){sheet=true;render();return}
+  if(e.target.closest('[data-save]')){save();return}
+  const un=e.target.closest('[data-undo]');
+  if(un){undo(Number(un.dataset.undo));return}
+  if(e.target.closest('[data-undoall]')){undoAll();return}
+  const c=e.target.closest('[data-close]');
+  if(c){
+    const card=D.cards[Number(c.dataset.ci)];
+    return enqueue('close',c.dataset.close,card&&card.ts,card?(card.who+(card.subject?' — '+card.subject:'')):c.dataset.close);
+  }
+  const d=e.target.closest('[data-draft]');
+  if(d) return askDraft(d.dataset.draft);
+  const cp=e.target.closest('[data-copy]');
+  if(cp){
+    const el=document.getElementById('d'+cp.dataset.copy);
+    const txt=el?el.innerText:'';
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt);
+      }else{
+        const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);
+        ta.select();document.execCommand('copy');ta.remove();
+      }
+      cp.textContent='Скопировано';
+      setTimeout(()=>{cp.textContent='Скопировать'},1500);
+    }catch(err){ alert('Не скопировалось, выдели текст вручную'); }
+    return;
+  }
+  const dn=e.target.closest('[data-done]');
+  if(dn){
+    const id=dn.dataset.done, t=(D.tasks||[]).find(x=>x.id===id);
+    return enqueue('done',id,'',t?t.text:id);
+  }
+});
+
+// Ответ пишет Точка: открываем с ней чат с уже подставленным запросом.
+const ASSISTANT = '@dot_nex_bot';
+function askDraft(id){
+  const card=D.cards.find(c=>c.id===id);
+  if(!card) return;
+  const q = 'Черновик ответа: ' + card.who + (card.subject ? ' — ' + card.subject : '');
+  const url = 'https://t.me/' + ASSISTANT.replace('@','') + '?text=' + encodeURIComponent(q);
+  try{
+    if(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.openTelegramLink){
+      Telegram.WebApp.openTelegramLink(url);
+    } else {
+      window.location.href = url;
+    }
+  }catch(err){ alert('Не открылось: '+err.message); }
+}
+
+try{
+  if(window.Telegram&&Telegram.WebApp){Telegram.WebApp.ready();Telegram.WebApp.expand();}
+}catch(e){}
+
+// Мягкая защита: из Telegram пускаем только хозяина. В обычном браузере
+// страница открыта (именно так её смотрят с рабочего компьютера).
+// Это не настоящая защита: данные лежат в самом файле. См. СОСТОЯНИЕ.md.
+const ME = 361483665;
+function allowed(){
+  try{
+    const tg = window.Telegram && Telegram.WebApp;
+    if(!tg || !tg.initData) return true;
+    const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
+    return !!u && Number(u.id) === ME;
+  }catch(e){ return true; }
+}
+
+if(!allowed()){
+  D=null;
+  $('feed').innerHTML='<div class="empty">Это личная страница. Открой её из своего Telegram.</div>';
+  $('gen').textContent='';
+} else if(window.DASH && verify(window.DASH)){
+  D=window.DASH.data; H=lsGet(); loadPend(); render();
+} else {
+  D=null;
+  $('feed').innerHTML='<div class="empty">Данных нет или страница открыта в неположенном месте.</div>';
+  $('gen').textContent='';
+}
+</script>
+</body>
+</html>
